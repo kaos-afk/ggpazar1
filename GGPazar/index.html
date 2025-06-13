@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>GGpazar – Valorant Hesap Pazarı</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: #0a0a0f;
+      color: #fff;
+    }
+
+    header {
+      background: linear-gradient(90deg, #00ffe7, #8a2be2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      box-shadow: 0 0 25px #00ffe7;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .auth-buttons, #authLogged {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .auth-btn {
+      background: #121222;
+      color: #00ffe7;
+      border: 2px solid #00ffe7;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+    .auth-btn:hover {
+      background: #00ffe7;
+      color: #121222;
+      box-shadow: 0 0 10px #00ffe7;
+    }
+
+    #authLogged {
+      display: none;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1rem 0;
+      flex-wrap: wrap;
+    }
+
+    .filters select {
+      padding: 0.5rem;
+      background: #1e1e2f;
+      border: 1px solid #2e2e4d;
+      color: #fff;
+      border-radius: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      min-width: 120px;
+      transition: 0.3s;
+    }
+    .filters select:hover {
+      border-color: #00ffe7;
+      box-shadow: 0 0 8px #00ffe7;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 2rem;
+      gap: 2rem;
+    }
+
+    .card {
+      background: #121222;
+      border: 2px solid #282c34;
+      border-radius: 15px;
+      padding: 1.5rem;
+      width: 300px;
+      box-shadow: 0 0 15px rgba(138, 43, 226, 0.6);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00ffe7;
+    }
+    .card h3 {
+      color: #00ffe7;
+      margin: 0 0 0.5rem 0;
+      font-weight: 700;
+    }
+    .card p {
+      margin: 0.3rem 0;
+      font-weight: 600;
+    }
+    .card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .card .contact-info {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #282c34;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #00ffe7, #8a2be2);
+      border: none;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 1rem;
+      width: 100%;
+      transition: 0.3s;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .btn:hover {
+      box-shadow: 0 0 10px #00ffe7;
+    }
+
+    /* Modal arka plan */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      z-index: 200;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(3px);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-bg.active {
+      display: flex;
+    }
+
+    /* Modal kutusu */
+    .modal {
+      background: #121222;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00ffe7;
+      width: 400px;
+      max-width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      font-family: 'Orbitron', sans-serif;
+      color: #00ffe7;
+      position: relative;
+    }
+
+    .modal h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    .modal label {
+      display: block;
+      margin: 0.7rem 0 0.2rem 0;
+      font-weight: 600;
+    }
+
+    .modal input, .modal select, .modal textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #282c34;
+      background: #1e1e2f;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      box-sizing: border-box;
+    }
+
+    .modal textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .modal button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(90deg, #00ffe7, #8a2be2);
+      border: none;
+      border-radius: 8px;
+      color: #121222;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .modal button:hover {
+      box-shadow: 0 0 10px #00ffe7;
+    }
+
+    .modal .close-btn {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #00ffe7;
+      font-weight: 900;
+      background: transparent;
+      border: none;
+      width: auto;
+      margin: 0;
+      padding: 0;
+    }
+
+    .error-msg {
+      color: #ff4d4d;
+      font-weight: 700;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      min-height: 1.2rem;
+      text-align: center;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+
+    .file-input-label {
+      background: #282c34;
+      color: #00ffe7;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: block;
+      text-align: center;
+      border: 1px solid #00ffe7;
+      transition: 0.3s;
+    }
+
+    .file-input-label:hover {
+      background: #00ffe7;
+      color: #121222;
+    }
+
+    .image-preview {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* Hesap düzenle için butonlar */
+    .edit-btn, .delete-btn {
+      position: absolute;
+      top: 15px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: #00ffe7;
+      font-weight: 900;
+      font-size: 1.2rem;
+      transition: 0.3s;
+    }
+    .edit-btn:hover, .delete-btn:hover {
+      color: #8a2be2;
+      text-shadow: 0 0 6px #00ffe7;
+    }
+    .edit-btn {
+      right: 45px;
+    }
+    .delete-btn {
+      right: 15px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  GGpazar
+  <div id="authButtons" class="auth-buttons">
+    <button class="auth-btn" onclick="openModal('login')">Giriş Yap</button>
+    <button class="auth-btn" onclick="openModal('register')">Kayıt Ol</button>
+  </div>
+  <div id="authLogged" style="display:none;">
+    <span id="userEmail"></span>
+    <button class="auth-btn" id="addProductBtn" onclick="openModal('addProduct')" style="display:none;">Ürün Ekle</button>
+    <button class="auth-btn" onclick="logout()">Çıkış Yap</button>
+  </div>
+</header>
+
+<div class="filters">
+  <select id="filter-rank" onchange="filtrele()">
+    <option value="">Rank Seç</option>
+    <option value="Iron">Iron</option>
+    <option value="Bronze">Bronze</option>
+    <option value="Silver">Silver</option>
+    <option value="Gold">Gold</option>
+    <option value="Platinum">Platinum</option>
+    <option value="Diamond">Diamond</option>
+    <option value="Immortal">Immortal</option>
+    <option value="Radiant">Radiant</option>
+  </select>
+
+  <select id="filter-level" onchange="filtrele()">
+    <option value="">Level Seç</option>
+    <option value="0-20">0-20</option>
+    <option value="21-40">21-40</option>
+    <option value="41-60">41-60</option>
+    <option value="61-80">61-80</option>
+    <option value="81+">81+</option>
+  </select>
+</div>
+
+<div class="container" id="hesaplar">
+  <!-- Hesap kartları buraya -->
+</div>
+
+<!-- Giriş Modal -->
+<div class="modal-bg" id="loginModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('login')">&times;</button>
+    <h2>Giriş Yap</h2>
+    <form onsubmit="return login(event)">
+      <label for="loginEmail">E-posta</label>
+      <input id="loginEmail" type="email" required autocomplete="username" />
+      <label for="loginPassword">Şifre</label>
+      <input id="loginPassword" type="password" required autocomplete="current-password" />
+      <div class="error-msg" id="loginError"></div>
+      <button type="submit">Giriş Yap</button>
+    </form>
+  </div>
+</div>
+
+<!-- Kayıt Modal -->
+<div class="modal-bg" id="registerModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('register')">&times;</button>
+    <h2>Kayıt Ol</h2>
+    <form onsubmit="return register(event)">
+      <label for="registerEmail">E-posta</label>
+      <input id="registerEmail" type="email" required autocomplete="email" />
+      <label for="registerPassword">Şifre (min 6 karakter)</label>
+      <input id="registerPassword" type="password" required minlength="6" autocomplete="new-password" />
+      <label for="registerRole">Rol Seç</label>
+      <select id="registerRole" required>
+        <option value="" disabled selected>Seçiniz</option>
+        <option value="satıcı">Satıcı</option>
+        <option value="alıcı">Alıcı</option>
+      </select>
+      <div class="error-msg" id="registerError"></div>
+      <button type="submit">Kayıt Ol</button>
+    </form>
+  </div>
+</div>
+
+<!-- Ürün Ekleme Modal -->
+<div class="modal-bg" id="addProductModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal('addProduct')">&times;</button>
+    <h2>Ürün Ekle</h2>
+    <form onsubmit="return addProduct(event)">
+      <input type="hidden" id="editIndex" value="-1" />
+      
+      <label for="nick">Nick</label>
+      <input type="text" id="nick" required />
+
+      <label for="rank">Rank</label>
+      <select id="rank" required>
+        <option value="" disabled selected>Seçiniz</option>
+        <option>Iron</option>
+        <option>Bronze</option>
+        <option>Silver</option>
+        <option>Gold</option>
+        <option>Platinum</option>
+        <option>Diamond</option>
+        <option>Immortal</option>
+        <option>Radiant</option>
+      </select>
+
+      <label for="level">Level</label>
+      <input type="number" id="level" min="0" max="200" required />
+
+      <label for="fiyat">Fiyat (₺)</label>
+      <input type="number" id="fiyat" min="0" required />
+
+      <label for="detay">Detaylar</label>
+      <textarea id="detay" required placeholder="Skin bilgileri, özellikler vb."></textarea>
+
+      <label for="productImage">Hesap Fotoğrafı</label>
+      <div class="file-input-wrapper">
+        <input type="file" id="productImage" accept="image/*" onchange="previewImage(event)" />
+        <label for="productImage" class="file-input-label">Fotoğraf Seç</label>
+      </div>
+      <img id="imagePreview" class="image-preview" alt="Önizleme" />
+
+      <label for="whatsapp">WhatsApp Numarası</label>
+      <input type="tel" id="whatsapp" placeholder="0555 123 4567" />
+
+      <label for="discord">Discord Kullanıcı Adı</label>
+      <input type="text" id="discord" placeholder="kullaniciadi#1234" />
+
+      <label for="telegram">Telegram Kullanıcı Adı</label>
+      <input type="text" id="telegram" placeholder="@kullaniciadi" />
+
+      <button type="submit">Kaydet</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // LocalStorage key
+  const HESAP_KEY = "ggpazar_hesaplar";
+
+  // Kullanıcı hesapları localStorage'dan al veya default liste
+  function getHesaplar() {
+    const data = localStorage.getItem(HESAP_KEY);
+    if (!data) {
+      // İlk defa açınca default hesaplar
+      const defaultHesaplar = [
+        { 
+          nick: "AslanVuruşu", 
+          rank: "Gold", 
+          fiyat: 350, 
+          detay: "Vandal Prime, Reaver Phantom", 
+          level: 48,
+          image: "",
+          whatsapp: "0555 123 4567",
+          discord: "AslanVurus#1234",
+          telegram: "@aslancik"
+        },
+        { 
+          nick: "NightWolf", 
+          rank: "Diamond", 
+          fiyat: 580, 
+          detay: "Elderflame + Valorant Champions skinleri", 
+          level: 77,
+          image: "",
+          whatsapp: "0533 987 6543",
+          discord: "NightWolf#9876",
+          telegram: "@nightwolf"
+        },
+        { 
+          nick: "TryHard123", 
+          rank: "Silver", 
+          fiyat: 220, 
+          detay: "Classic skinler ve düşük seviye", 
+          level: 15,
+          image: "",
+          whatsapp: "0505 555 1234",
+          discord: "TryHard#5555",
+          telegram: "@tryhard123"
+        }
+      ];
+      localStorage.setItem(HESAP_KEY, JSON.stringify(defaultHesaplar));
+      return defaultHesaplar;
+    }
+    return JSON.parse(data);
+  }
+
+  // Hesapları kaydet
+  function saveHesaplar(hesaplar) {
+    localStorage.setItem(HESAP_KEY, JSON.stringify(hesaplar));
+  }
+
+  // Modal aç/kapa
+  function openModal(modal) {
+    document.getElementById(modal + "Modal").classList.add("active");
+    clearErrors();
+  }
+  function closeModal(modal) {
+    document.getElementById(modal + "Modal").classList.remove("active");
+    clearErrors();
+    if (modal === 'addProduct') {
+      document.getElementById('editIndex').value = '-1';
+      document.getElementById('nick').closest('form').reset();
+      document.getElementById('imagePreview').style.display = 'none';
+    }
+  }
+
+  // Hataları temizle
+  function clearErrors() {
+    const errs = document.querySelectorAll(".error-msg");
+    errs.forEach(e => e.innerText = "");
+  }
+
+  // Fotoğraf önizleme
+  function previewImage(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('imagePreview');
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  // Kayıt işlemi
+  function register(e) {
+    e.preventDefault();
+    clearErrors();
+
+    const email = document.getElementById("registerEmail").value.trim().toLowerCase();
+    const password = document.getElementById("registerPassword").value;
+    const role = document.getElementById("registerRole").value;
+
+    if (!role) {
+      document.getElementById("registerError").innerText = "Rol seçmelisin abi!";
+      return false;
+    }
+    if (localStorage.getItem("user_" + email)) {
+      document.getElementById("registerError").innerText = "Bu e-posta zaten kayıtlı.";
+      return false;
+    }
+    if (password.length < 6) {
+      document.getElementById("registerError").innerText = "Şifre en az 6 karakter olmalı.";
+      return false;
+    }
+
+    localStorage.setItem("user_" + email, JSON.stringify({ email, password, role }));
+    alert("Kayıt başarılı! Giriş yapabilirsin.");
+    closeModal("register");
+    return false;
+  }
+
+  // Giriş işlemi
+  function login(e) {
+    e.preventDefault();
+    clearErrors();
+
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+
+    const storedUser = localStorage.getItem("user_" + email);
+    if (!storedUser) {
+      document.getElementById("loginError").innerText = "Böyle bir kullanıcı yok.";
+      return false;
+    }
+    const user = JSON.parse(storedUser);
+    if (user.password !== password) {
+      document.getElementById("loginError").innerText = "Şifre yanlış.";
+      return false;
+    }
+
+    // Giriş başarılı, oturum aç
+    localStorage.setItem("ggpazar_loggedin", JSON.stringify(user));
+    updateAuthUI();
+    closeModal("login");
+    return false;
+  }
+
+  // Çıkış yap
+  function logout() {
+    localStorage.removeItem("ggpazar_loggedin");
+    updateAuthUI();
+  }
+
+  // Giriş durumuna göre arayüzü güncelle
+  function updateAuthUI() {
+    const logged = localStorage.getItem("ggpazar_loggedin");
+    if (!logged) {
+      document.getElementById("authButtons").style.display = "flex";
+      document.getElementById("authLogged").style.display = "none";
+      document.getElementById("addProductBtn").style.display = "none";
+    } else {
+      const user = JSON.parse(logged);
+      document.getElementById("authButtons").style.display = "none";
+      document.getElementById("authLogged").style.display = "flex";
+      document.getElementById("userEmail").innerText = user.email + (user.role === "satıcı" ? " (Satıcı)" : " (Alıcı)");
+
+      if (user.role === "satıcı") {
+        document.getElementById("addProductBtn").style.display = "block";
+      } else {
+        document.getElementById("addProductBtn").style.display = "none";
+      }
+    }
+  }
+
+  // Ürün ekleme
+  function addProduct(e) {
+    e.preventDefault();
+
+    const nick = document.getElementById("nick").value.trim();
+    const rank = document.getElementById("rank").value;
+    const level = Number(document.getElementById("level").value);
+    const fiyat = Number(document.getElementById("fiyat").value);
+    const detay = document.getElementById("detay").value.trim();
+    const whatsapp = document.getElementById("whatsapp").value.trim();
+    const discord = document.getElementById("discord").value.trim();
+    const telegram = document.getElementById("telegram").value.trim();
+    const editIndex = Number(document.getElementById("editIndex").value);
+
+    if (!nick || !rank || isNaN(level) || isNaN(fiyat) || !detay) {
+      alert("Tüm zorunlu alanları eksiksiz doldurmalısın!");
+      return false;
+    }
+
+    // Fotoğraf işleme
+    const imageFile = document.getElementById("productImage").files[0];
+    let imageData = "";
+    
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imageData = e.target.result;
+        saveProduct();
+      };
+      reader.readAsDataURL(imageFile);
+    } else {
+      saveProduct();
+    }
+
+    function saveProduct() {
+      const newProduct = {
+        nick, 
+        rank, 
+        level, 
+        fiyat, 
+        detay, 
+        image: imageData,
+        whatsapp: whatsapp || "",
+        discord: discord || "",
+        telegram: telegram || ""
+      };
+
+      if (editIndex === -1) {
+        // Yeni ekle
+        hesaplar.push(newProduct);
+      } else {
+        // Düzenle
+        hesaplar[editIndex] = newProduct;
+      }
+
+      saveHesaplar(hesaplar);
+      renderHesaplar();
+      closeModal("addProduct");
+      alert("Ürün başarıyla kaydedildi!");
+    }
+
+    return false;
+  }
+
+  // Hesap listesi
+  let hesaplar = getHesaplar();
+
+  function renderHesaplar() {
+    const container = document.getElementById("hesaplar");
+    container.innerHTML = "";
+    const rankFilter = document.getElementById("filter-rank").value;
+    const levelFilter = document.getElementById("filter-level").value;
+
+    let filtered = hesaplar;
+
+    // Filtre uygula
+    if (rankFilter) {
+      filtered = filtered.filter(h => h.rank === rankFilter);
+    }
+    if (levelFilter) {
+      filtered = filtered.filter(h => {
+        const lvl = Number(h.level);
+        if (levelFilter === "0-20") return lvl >= 0 && lvl <= 20;
+        if (levelFilter === "21-40") return lvl >= 21 && lvl <= 40;
+        if (levelFilter === "41-60") return lvl >= 41 && lvl <= 60;
+        if (levelFilter === "61-80") return lvl >= 61 && lvl <= 80;
+        if (levelFilter === "81+") return lvl >= 81;
+      });
+    }
+
+    if (filtered.length === 0) {
+      container.innerHTML = `<p style="color:#888; font-weight:700;">Filtrelere uygun hesap bulunamadı.</p>`;
+      return;
+    }
+
+    filtered.forEach((h, i) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      
+      let contactInfo = "";
+      if (h.whatsapp || h.discord || h.telegram) {
+        contactInfo = `<div class="contact-info">`;
+        if (h.whatsapp) contactInfo += `<p><b>WhatsApp:</b> ${h.whatsapp}</p>`;
+        if (h.discord) contactInfo += `<p><b>Discord:</b> ${h.discord}</p>`;
+        if (h.telegram) contactInfo += `<p><b>Telegram:</b> ${h.telegram}</p>`;
+        contactInfo += `</div>`;
+      }
+
+      card.innerHTML = `
+        ${h.image ? `<img src="${h.image}" alt="Hesap Görseli" />` : ''}
+        <h3>${h.nick}</h3>
+        <p><b>Rank:</b> ${h.rank}</p>
+        <p><b>Level:</b> ${h.level}</p>
+        <p><b>Fiyat:</b> ₺${h.fiyat}</p>
+        <p><b>Detay:</b> ${h.detay}</p>
+        ${contactInfo}
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  // Filtrele fonksiyonu
+  function filtrele() {
+    renderHesaplar();
+  }
+
+  // Başlangıçta listeyi göster
+  renderHesaplar();
+  updateAuthUI();
+</script>
+
+</body>
+</html>
